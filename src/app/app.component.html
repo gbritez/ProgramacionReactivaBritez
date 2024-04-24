@@ -1,2 +1,3 @@
-<app-students></app-students>
+<app-students *ngIf="showComponent"></app-students>
+<button (click)="toggle()">Toggle list</button>
 <router-outlet />

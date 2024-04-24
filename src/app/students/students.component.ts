@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { StudentsService } from '../services/students.service';
 import { Student } from '../models/student';
 import { Observable, Subject, map, takeUntil } from 'rxjs';
-import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-students',
@@ -10,22 +9,27 @@ import { tap } from 'rxjs/operators';
   styleUrls: ['./students.component.css']
 })
 export class StudentsComponent implements OnInit, OnDestroy {
-  onDestroy$ = new Subject<void>();
-  students$!: Observable<string[]>;
 
+  onDestroy$ = new Subject<boolean>();
+  students$!: Observable<string[]>;
   constructor(
     public studentsService: StudentsService
   ) { }
 
   ngOnInit() {
-    this.students$ = this.studentsService.getStudents().pipe(
-      takeUntil(this.onDestroy$),
-      map(students => students.map(student => `${student.first_name} ${student.last_name}`)),
-    );
+    this.students$ = this.studentsService.getStudents()
+      .pipe(
+        takeUntil(this.onDestroy$),
+        map(students => {
+          return students.map(x => x.first_name)
+        }),
+      )
   }
 
-  ngOnDestroy() {
-    this.onDestroy$.next();
+  ngOnDestroy(): void {
+    console.log('componente destruido')
+    this.onDestroy$.next(true);
     this.onDestroy$.complete();
   }
+
 }
